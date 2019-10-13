@@ -17,8 +17,6 @@ RUN apt-get --allow-unauthenticated update -y \
 RUN echo "deb [trusted=yes] http://apt.llvm.org/bionic/ llvm-toolchain-bionic-7 main" >> /etc/apt/sources.list
 RUN echo "deb [trusted=yes] http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main" >> /etc/apt/sources.list
 RUN add-apt-repository ppa:ubuntu-toolchain-r/test
-RUN curl https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
-RUN apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
 
 RUN apt-get --allow-unauthenticated update -y \
     && env DEBIAN_FRONTEND=noninteractive \
@@ -62,11 +60,9 @@ RUN apt-get --allow-unauthenticated update -y \
             zlib1g-dev \
             liblz4-dev \
             libdouble-conversion-dev \
-            libsparsehash-dev \
             librdkafka-dev \
             libpoconetssl50 \
             libpoco-dev \
-            libsparsehash-dev \
             libgoogle-perftools-dev \
             libzstd-dev \
             libltdl-dev \
