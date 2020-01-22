@@ -53,6 +53,8 @@ public:
 
     Chunk generate() override;
 
+    void resetParser() override;
+
 protected:
     /** Read next row and append it to the columns.
       * If no more rows - return false.
@@ -77,7 +79,6 @@ protected:
 
 private:
     Params params;
-    Stopwatch total_stopwatch {CLOCK_MONOTONIC_COARSE};
 
     size_t total_rows = 0;
     size_t num_errors = 0;

@@ -1,16 +1,13 @@
 #pragma once
 
-#include <queue>
-
 #include <common/logger_useful.h>
-#include <Common/filesystemHelpers.h>
 
+#include <Common/filesystemHelpers.h>
 #include <Core/SortDescription.h>
 #include <Core/SortCursor.h>
 
 #include <DataStreams/IBlockInputStream.h>
 #include <DataStreams/NativeBlockInputStream.h>
-#include <DataStreams/TemporaryFileStream.h>
 
 #include <IO/ReadBufferFromFile.h>
 #include <Compression/CompressedReadBuffer.h>
@@ -18,6 +15,8 @@
 
 namespace DB
 {
+
+struct TemporaryFileStream;
 
 namespace ErrorCodes
 {
@@ -34,7 +33,7 @@ class MergeSortingBlocksBlockInputStream : public IBlockInputStream
 {
 public:
     /// limit - if not 0, allowed to return just first 'limit' rows in sorted order.
-    MergeSortingBlocksBlockInputStream(Blocks & blocks_, SortDescription & description_,
+    MergeSortingBlocksBlockInputStream(Blocks & blocks_, const SortDescription & description_,
         size_t max_merged_block_size_, UInt64 limit_ = 0);
 
     String getName() const override { return "MergeSortingBlocks"; }
@@ -55,19 +54,19 @@ private:
     UInt64 limit;
     size_t total_merged_rows = 0;
 
-    using CursorImpls = std::vector<SortCursorImpl>;
-    CursorImpls cursors;
+    SortCursorImpls cursors;
 
     bool has_collation = false;
 
-    std::priority_queue<SortCursor> queue_without_collation;
-    std::priority_queue<SortCursorWithCollation> queue_with_collation;
+    SortingHeap<SortCursor> queue_without_collation;
+    SortingHeap<SimpleSortCursor> queue_simple;
+    SortingHeap<SortCursorWithCollation> queue_with_collation;
 
     /** Two different cursors are supported - with and without Collation.
      *  Templates are used (instead of virtual functions in SortCursor) for zero-overhead.
      */
-    template <typename TSortCursor>
-    Block mergeImpl(std::priority_queue<TSortCursor> & queue);
+    template <typename TSortingHeap>
+    Block mergeImpl(TSortingHeap & queue);
 };
 
 

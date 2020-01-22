@@ -22,7 +22,7 @@ namespace ErrorCodes
 }
 
 StorageSystemColumns::StorageSystemColumns(const std::string & name_)
-    : name(name_)
+    : IStorage({"system", name_})
 {
     setColumns(ColumnsDescription(
     {
@@ -292,7 +292,7 @@ BlockInputStreams StorageSystemColumns::read(
             const DatabasePtr database = databases.at(database_name);
             offsets[i] = i ? offsets[i - 1] : 0;
 
-            for (auto iterator = database->getIterator(context); iterator->isValid(); iterator->next())
+            for (auto iterator = database->getTablesWithDictionaryTablesIterator(context); iterator->isValid(); iterator->next())
             {
                 const String & table_name = iterator->name();
                 storages.emplace(std::piecewise_construct,
